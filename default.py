@@ -2,9 +2,16 @@ import os,sys,urllib2
 import xbmcplugin,xbmcgui
 import xml.etree.ElementTree as ET
 
+try:
+  import StorageServer
+except:
+  import storageserverdummy as StorageServer
+
+cache = StorageServer.StorageServer("somafm", 24)
+
 __addon__ = "SomaFM"
 __addonid__ = "plugin.audio.somafm"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 def log(msg):
     print "[PLUGIN] '%s (%s)' " % (__addon__, __version__) + str(msg)
@@ -35,7 +42,7 @@ def getHTMLFor(url, withData=None, withReferrer=None):
     return data
 
 def addEntries():
-    somaXML = getHTMLFor(url="channels.xml")
+    somaXML = cache.cacheFunction(getHTMLFor, "channels.xml")
     channelsContainer = ET.fromstring(somaXML)
 
     for stations in channelsContainer.findall(".//channel"):
